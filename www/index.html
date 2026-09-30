@@ -984,18 +984,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loginWithGoogle(){
-  const redirectTo = window.Capacitor
-    ? "lovestorychat://auth"
-    : window.location.origin;
+  try{
+    if(!window.supabase){
+      alert("Supabase library မတက်လာပါ");
+      return;
+    }
 
-  const {error}=await supabaseClient.auth.signInWithOAuth({
-    provider:"google",
-    options:{redirectTo}
-  });
+    if(!supabaseClient){
+      alert("Supabase client မရှိပါ");
+      return;
+    }
 
-  if(error) alert(error.message);
+    const redirectTo = window.Capacitor
+      ? "lovestorychat://auth"
+      : window.location.origin;
+
+    const {data,error}=await supabaseClient.auth.signInWithOAuth({
+      provider:"google",
+      options:{
+        redirectTo:redirectTo
+      }
+    });
+
+    if(error){
+      alert("Google Login Error:\n"+error.message);
+      console.error(error);
+      return;
+    }
+
+    console.log("Google OAuth started",data);
+  }catch(e){
+    alert("Google Login Error:\n"+e.message);
+    console.error(e);
+  }
 }
-
 
 const SUPABASE_URL =
 "https://ggeerngrxlpmwgnujqsb.supabase.co";
@@ -1251,41 +1273,37 @@ async function register(){
 }
 
 async function login(){
+  try{
+    const email=document.getElementById("loginEmail").value.trim();
+    const password=document.getElementById("loginPassword").value;
 
-const email =
-document.getElementById("loginEmail")
-.value.trim();
+    if(!email || !password){
+      alert("Email နဲ့ Password ထည့်ပါ");
+      return;
+    }
 
-const password =
-document.getElementById("loginPassword")
-.value;
+    const {data,error}=await supabaseClient.auth.signInWithPassword({
+      email:email,
+      password:password
+    });
 
-if(!email || !password){
+    if(error){
+      alert("Email Login Error:\n"+error.message);
+      console.error(error);
+      return;
+    }
 
-alert("Email နဲ့ Password ထည့်ပါ");
+    if(!data || !data.session){
+      alert("Login session မရပါ");
+      return;
+    }
 
-return;
+    await startApp();
 
-}
-
-const {data,error} =
-await supabaseClient.auth.signInWithPassword({
-
-email:email,
-password:password
-
-});
-
-if(error){
-
-alert(error.message);
-
-return;
-
-}
-
-startApp();
-
+  }catch(e){
+    alert("Email Login Error:\n"+e.message);
+    console.error(e);
+  }
 }
 
 async function startApp(){
