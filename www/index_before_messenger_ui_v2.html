@@ -214,228 +214,7 @@ body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif}
 .input{display:flex;gap:8px;padding:10px;background:#fff;border-top:1px solid #ddd}
 .input input{flex:1;border:0;outline:0;background:#f0f2f5;border-radius:22px;padding:12px 16px;font-size:15px}
 .input button{border:0;border-radius:22px;padding:0 18px;font-weight:700}
-</style>
-<style>
-/* LoveStoryChat Messenger UI */
-.chat{
-  background:#fff;
-}
-
-.chatUsers{
-  padding:12px;
-  background:#fff;
-  border-bottom:1px solid #e4e6eb;
-}
-
-.chatTitle{
-  font-size:20px;
-  font-weight:700;
-  margin:2px 4px 12px;
-}
-
-#userList{
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding-bottom:4px;
-}
-
-#userList button{
-  border:0;
-  background:#f0f2f5;
-  padding:10px 16px;
-  border-radius:20px;
-  white-space:nowrap;
-  font-weight:600;
-}
-
-.header{
-  height:64px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:8px 16px;
-  border-bottom:1px solid #e4e6eb;
-  background:#fff;
-}
-
-.headerAvatar{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#f0f2f5;
-  font-size:22px;
-}
-
-.headerName{
-  font-size:17px;
-  font-weight:700;
-}
-
-.headerStatus{
-  font-size:12px;
-  color:#31a24c;
-  margin-top:2px;
-}
-
-.messages{
-  flex:1;
-  overflow-y:auto;
-  padding:14px;
-  background:#f0f2f5;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-
-.msg{
-  max-width:75%;
-  padding:10px 14px;
-  border-radius:18px;
-  border:0;
-  box-shadow:none;
-  margin:2px 0;
-  word-break:break-word;
-}
-
-.msg.me{
-  align-self:flex-end;
-  background:#0084ff;
-  color:#fff;
-  border-radius:18px 18px 4px 18px;
-}
-
-.msg.other{
-  align-self:flex-start;
-  background:#fff;
-  color:#111;
-  border-radius:18px 18px 18px 4px;
-}
-
-.input{
-  display:flex;
-  gap:8px;
-  padding:10px;
-  background:#fff;
-  border-top:1px solid #e4e6eb;
-}
-
-.input input{
-  flex:1;
-  border:0;
-  outline:0;
-  background:#f0f2f5;
-  border-radius:22px;
-  padding:12px 16px;
-  font-size:15px;
-}
-
-.input button{
-  width:44px;
-  height:44px;
-  border:0;
-  border-radius:50%;
-  background:#0084ff;
-  color:#fff;
-  font-size:20px;
-  padding:0;
-}
-
-@media(max-width:600px){
-  .app{
-    min-height:100vh;
-  }
-
-  .sidebar{
-    width:100px;
-    padding:8px;
-  }
-
-  .chat{
-    min-width:0;
-  }
-
-  .profile{
-    padding:8px 4px;
-  }
-
-  .profileInfo{
-    display:none;
-  }
-
-  .logout{
-    width:100%;
-    padding:8px 4px;
-    font-size:11px;
-  }
-
-  .logo{
-    font-size:13px;
-    text-align:center;
-  }
-
-  .avatar{
-    width:52px;
-    height:52px;
-  }
-}
-</style>
-
-<style>
-.chatUserItem{
-  display:flex!important;
-  align-items:center;
-  gap:8px;
-  padding:6px 12px!important;
-  background:#f0f2f5!important;
-}
-
-.chatUserAvatar{
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  object-fit:cover;
-}
-
-.chatUserName{
-  font-size:14px;
-}
-</style>
-
-<style>
-.msgTime{
-  font-size:10px;
-  opacity:.65;
-  margin-top:3px;
-  text-align:right;
-}
-
-.msg.other .msgTime{
-  text-align:left;
-}
-</style>
-<style>
-.msgMeta{
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
-  gap:4px;
-  margin-top:3px;
-}
-
-.msgSeen{
-  font-size:11px;
-  opacity:.8;
-}
-
-.msg.other .msgMeta{
-  justify-content:flex-start;
-}
-</style>
-</head>
+</style></head>
 
 <body>
 
@@ -566,10 +345,7 @@ Profile
 
 <br>
 
-<div class="chatUsers">
-  <div class="chatTitle">Chats</div>
-  <div id="userList"></div>
-</div>
+<div class="chatUsers"><h4>Chat Users</h4><div id="userList"></div></div>
 
 <button class="logout" onclick="logout()">
 Logout
@@ -583,11 +359,7 @@ Logout
 <main class="chat">
 
 <div class="header">
-  <div class="headerAvatar">❤️</div>
-  <div>
-    <div class="headerName">Love Story Chat</div>
-    <div class="headerStatus">Online</div>
-  </div>
+❤️ Love Story Chat
 </div>
 
 <div
@@ -602,8 +374,8 @@ id="messageInput"
 placeholder="Type a message..."
 >
 
-<button onclick="sendMessage()" aria-label="Send message">
-  ➤
+<button onclick="sendMessage()">
+Send
 </button>
 
 </div>
@@ -1065,30 +837,14 @@ async function loadChatUsers(){
     .neq("id", user.id)
     .order("name");
 
-  if(error){
-    console.error(error);
-    return;
-  }
+  if(error){ console.error(error); return; }
 
   const list = document.getElementById("userList");
   list.innerHTML = "";
 
   data.forEach(profile => {
     const button = document.createElement("button");
-    button.className = "chatUserItem";
-
-    const avatar = document.createElement("img");
-    avatar.className = "chatUserAvatar";
-    avatar.src = profile.avatar_url || "https://via.placeholder.com/50";
-    avatar.alt = "";
-
-    const name = document.createElement("span");
-    name.className = "chatUserName";
-    name.textContent = profile.name || "User";
-
-    button.appendChild(avatar);
-    button.appendChild(name);
-
+    button.textContent = profile.name || "User";
     button.onclick = () => selectChatUser(profile);
     list.appendChild(button);
   });
@@ -1096,35 +852,7 @@ async function loadChatUsers(){
 
 function selectChatUser(profile){
   selectedUserId = profile.id;
-
-  const headerName = document.querySelector(".headerName");
-  const headerStatus = document.querySelector(".headerStatus");
-  const headerAvatar = document.querySelector(".headerAvatar");
-
-  if(headerName){
-    headerName.textContent = profile.name || "Chat";
-  }
-
-  if(headerStatus){
-    headerStatus.textContent = "Online";
-  }
-
-  if(headerAvatar){
-    headerAvatar.innerHTML = "";
-
-    if(profile.avatar_url){
-      const img = document.createElement("img");
-      img.src = profile.avatar_url;
-      img.style.width = "42px";
-      img.style.height = "42px";
-      img.style.borderRadius = "50%";
-      img.style.objectFit = "cover";
-      headerAvatar.appendChild(img);
-    }else{
-      headerAvatar.textContent = "❤️";
-    }
-  }
-
+  document.querySelector(".header").textContent = "❤️ " + (profile.name || "Chat");
   loadMessages();
 }
 
@@ -1163,35 +891,8 @@ async function addMessage(message){
 
   const div = document.createElement("div");
   div.className = "msg " + (message.user_id === user.id ? "me" : "other");
+  div.textContent = message.content || "";
 
-  const text = document.createElement("div");
-  text.textContent = message.content || "";
-
-  const meta = document.createElement("div");
-  meta.className = "msgMeta";
-
-  const time = document.createElement("span");
-  time.className = "msgTime";
-
-  if(message.created_at){
-    const date = new Date(message.created_at);
-    time.textContent = date.toLocaleTimeString([], {
-      hour:"2-digit",
-      minute:"2-digit"
-    });
-  }
-
-  meta.appendChild(time);
-
-  if(message.user_id === user.id){
-    const seen = document.createElement("span");
-    seen.className = "msgSeen";
-    seen.textContent = message.seen ? "✓✓" : "✓";
-    meta.appendChild(seen);
-  }
-
-  div.appendChild(text);
-  div.appendChild(meta);
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }
