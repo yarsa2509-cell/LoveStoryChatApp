@@ -723,6 +723,92 @@ body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif}
   font-size:14px;
 }
 </style>
+
+<style>
+/* Phone-only login screen */
+html,body{
+  width:100%;
+  min-height:100%;
+  margin:0;
+}
+
+#auth{
+  width:100%;
+  min-height:100dvh;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-sizing:border-box;
+  padding:20px 14px;
+  overflow:hidden;
+}
+
+.auth-box{
+  width:min(100%, 390px);
+  max-width:390px;
+  box-sizing:border-box;
+}
+
+.auth-box input,
+.auth-box button{
+  width:100%;
+  box-sizing:border-box;
+  min-height:48px;
+  border-radius:12px;
+}
+
+.auth-box button{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  cursor:pointer;
+}
+
+.google-login-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  background:#fff !important;
+  color:#222 !important;
+  border:1px solid #dadce0 !important;
+  font-size:15px;
+  font-weight:600;
+}
+
+.google-login-btn:active{
+  background:#f1f3f4 !important;
+  transform:scale(.99);
+}
+
+.google-g-icon{
+  width:22px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Arial,sans-serif;
+  font-size:20px;
+  font-weight:700;
+  color:#4285f4;
+}
+
+@media (orientation:landscape){
+  #auth{
+    min-height:100vh;
+    height:100vh;
+  }
+}
+
+/* Keep the app optimized for phone screens */
+@media (min-width:700px){
+  #auth{
+    max-width:430px;
+    margin:0 auto;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -755,7 +841,14 @@ Login
 
 <button class="switch" onclick="showPhone()" style="display:none">📱 Login with Phone</button>
 
-<button onclick="loginWithGoogle()">🔵 Continue with Google</button>
+<button
+  type="button"
+  class="google-login-btn"
+  onclick="loginWithGoogle()"
+>
+  <span class="google-g-icon">G</span>
+  <span>Continue with Google</span>
+</button>
 <button class="switch" onclick="showRegister()">Create New Account</button>
 
 </div>
