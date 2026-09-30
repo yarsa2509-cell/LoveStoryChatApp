@@ -961,31 +961,40 @@ placeholder="Type a message..."
 
 
 <script>
+async function handleLoveStoryAuthCallback(url){
+  if(!url || !url.startsWith("lovestorychat://auth")) return;
+
+  const hash = url.split("#")[1] || "";
+  const params = new URLSearchParams(hash);
+
+  const access_token = params.get("access_token");
+  const refresh_token = params.get("refresh_token");
+
+  if(access_token && refresh_token){
+    const {error} = await supabaseClient.auth.setSession({
+      access_token,
+      refresh_token
+    });
+
+    if(error){
+      alert("Google Login session မဝင်ပါ: " + error.message);
+      console.error(error);
+      return;
+    }
+
+    await startApp();
+  }
+}
+
+document.addEventListener("loveStoryAuthCallback", async (event)=>{
+  const url = event.detail && event.detail.url;
+  await handleLoveStoryAuthCallback(url);
+});
+
 document.addEventListener("DOMContentLoaded", async () => {
-  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-    window.Capacitor.Plugins.App.addListener("appUrlOpen", async ({ url }) => {
-      if (!url || !url.startsWith("lovestorychat://auth")) return;
-
-      const hash = url.split("#")[1] || "";
-      const params = new URLSearchParams(hash);
-
-      const access_token = params.get("access_token");
-      const refresh_token = params.get("refresh_token");
-
-      if (access_token && refresh_token) {
-        const { error } = await supabaseClient.auth.setSession({
-          access_token,
-          refresh_token
-        });
-
-        if (error) {
-          alert("Google Login session မဝင်ပါ: " + error.message);
-          return;
-        }
-
-        window.history.replaceState({}, document.title, "/");
-        startApp();
-      }
+  if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App){
+    window.Capacitor.Plugins.App.addListener("appUrlOpen", async ({url})=>{
+      await handleLoveStoryAuthCallback(url);
     });
   }
 });
