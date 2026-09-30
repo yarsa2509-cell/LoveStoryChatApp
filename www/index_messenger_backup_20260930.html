@@ -77,7 +77,10 @@ body{
   border:1px solid #6c63ff!important;
 }
 
-#otpForm{display:none!important;}
+#otpForm{
+#otpForm{display:none!important}
+  display:none;
+}
 
 #app{
   display:none;
@@ -247,19 +250,9 @@ Login
 <button class="switch" onclick="showPhone()" style="display:none">📱 Login with Phone</button>
 
 <button onclick="loginWithGoogle()">🔵 Continue with Google</button>
-<button class="switch" onclick="showRegister()">Create New Account</button>
 
 </div>
 
-
-<div id="registerForm" style="display:none">
-<h2>Create Account</h2>
-<input id="registerName" type="text" placeholder="Name">
-<input id="registerEmail" type="email" placeholder="Email">
-<input id="registerPassword" type="password" placeholder="Password">
-<button onclick="register()">Create Account</button>
-<button class="switch" onclick="showLogin()">Back to Login</button>
-</div>
 
 <div id="otpForm">
 
@@ -508,65 +501,6 @@ startApp();
 }
 
 
-function showRegister(){
-  document.getElementById("loginForm").style.display="none";
-  document.getElementById("otpForm").style.display="none";
-  document.getElementById("registerForm").style.display="block";
-}
-
-async function register(){
-  const name=document.getElementById("registerName").value.trim();
-  const email=document.getElementById("registerEmail").value.trim();
-  const password=document.getElementById("registerPassword").value;
-
-  if(!name || !email || !password){
-    alert("Name, Email နဲ့ Password အားလုံးထည့်ပါ");
-    return;
-  }
-
-  if(password.length < 6){
-    alert("Password အနည်းဆုံး 6 လုံး ထည့်ပါ");
-    return;
-  }
-
-  const {data,error}=await supabaseClient.auth.signUp({
-    email:email,
-    password:password
-  });
-
-  if(error){
-    alert(error.message);
-    return;
-  }
-
-  if(data.user){
-    const {error:profileError}=await supabaseClient
-      .from("profiles")
-      .upsert({id:data.user.id,name:name});
-
-    if(profileError){
-      alert("Account ရပြီး Profile သိမ်းမရပါ:\n"+profileError.message);
-      return;
-    }
-
-    const {error:publicError}=await supabaseClient
-      .from("public_profiles")
-      .upsert({id:data.user.id,name:name});
-
-    if(publicError){
-      alert("Account ရပြီး Public Profile သိမ်းမရပါ:\n"+publicError.message);
-      return;
-    }
-  }
-
-  if(data.session){
-    startApp();
-  }else{
-    alert("Account ဖန်တီးပြီးပါပြီ။ Email ကိုစစ်ပြီး Confirm လုပ်ပြီး Login ဝင်ပါ ❤️");
-    showLogin();
-  }
-}
-
 async function login(){
 
 const email =
@@ -687,19 +621,6 @@ async function openProfile(){
     return;
   }
 
-  const { error: publicError } =
-    await supabaseClient
-      .from("public_profiles")
-      .upsert({
-        id: user.id,
-        name: name
-      });
-
-  if(publicError){
-    alert("Public Profile သိမ်းမရပါ:\n" + publicError.message);
-    return;
-  }
-
   document.getElementById("profileName")
     .textContent = name;
 
@@ -764,16 +685,6 @@ async function saveProfileDetails(){
       .from("profiles")
       .upsert(profile);
 
-  const publicProfile = {
-    id: user.id,
-    name: profile.name || null,
-    avatar_url: profile.avatar_url || null
-  };
-
-  await supabaseClient
-    .from("public_profiles")
-    .upsert(publicProfile);
-
   if(error){
     alert("Profile သိမ်းမရပါ:\n" + error.message);
     return;
@@ -792,7 +703,7 @@ async function loadChatUsers(){
   if(!user) return;
 
   const { data, error } = await supabaseClient
-    .from("public_profiles")
+    .from("profiles")
     .select("id,name,avatar_url")
     .neq("id", user.id)
     .order("name");
