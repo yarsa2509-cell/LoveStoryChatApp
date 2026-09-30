@@ -309,6 +309,8 @@ Profile
 
 <br>
 
+<div class="chatUsers"><h4>Chat Users</h4><div id="userList"></div></div>
+
 <button class="logout" onclick="logout()">
 Logout
 </button>
@@ -541,6 +543,7 @@ async function startApp(){
   }
 
   loadMessages();
+  loadChatUsers();
 
 }
 
@@ -662,41 +665,62 @@ async function saveProfileDetails(){
 
   alert("Profile သိမ်းပြီးပါပြီ ❤️");
 }
+let selectedUserId = null;
+
+async function loadChatUsers(){
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user) return;
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("id,name,avatar_url")
+    .neq("id", user.id)
+    .order("name");
+
+  if(error){ console.error(error); return; }
+
+  const list = document.getElementById("userList");
+  list.innerHTML = "";
+
+  data.forEach(profile => {
+    const button = document.createElement("button");
+    button.textContent = profile.name || "User";
+    button.onclick = () => selectChatUser(profile);
+    list.appendChild(button);
+  });
+}
+
+function selectChatUser(profile){
+  selectedUserId = profile.id;
+  document.querySelector(".header").textContent = "❤️ " + (profile.name || "Chat");
+  loadMessages();
+}
+
 async function loadMessages(){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from("messages")
-.select("*")
-.order(
-"created_at",
-{ascending:true}
-);
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
-if(error){
+  if(!user || !selectedUserId) return;
 
-console.error(error);
+  const { data, error } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .or(`and(user_id.eq.${user.id},receiver_id.eq.${selectedUserId}),and(user_id.eq.${selectedUserId},receiver_id.eq.${user.id})`)
+    .order("created_at", {ascending:true});
 
-return;
+  if(error){
+    console.error(error);
+    return;
+  }
 
-}
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
 
-const box =
-document.getElementById("messages");
-
-box.innerHTML="";
-
-data.forEach(message=>{
-
-addMessage(message);
-
-});
+  data.forEach(message => {
+    addMessage(message);
+  });
 
 }
-
 
 function addMessage(message){
 
@@ -727,6 +751,11 @@ input.value.trim();
 
 if(!content)return;
 
+if(!selectedUserId){
+  alert("အရင် Chat User တစ်ယောက်ရွေးပါ");
+  return;
+}
+
 const {
 data:userData
 } =
@@ -741,7 +770,9 @@ await supabaseClient
 .insert({
 
 user_id:user.id,
-content:content
+receiver_id:selectedUserId,
+content:content,
+message_type:"text" 
 
 });
 
@@ -769,7 +800,22 @@ table:"messages"
 },
 payload=>{
 
-addMessage(payload.new);
+  supabaseClient.auth.getUser().then(({data:{user}})=>{
+
+    const message = payload.new;
+
+    if(
+      user &&
+      selectedUserId &&
+      (
+        (message.user_id === user.id && message.receiver_id === selectedUserId) ||
+        (message.user_id === selectedUserId && message.receiver_id === user.id)
+      )
+    ){
+      addMessage(message);
+    }
+
+  });
 
 }
 )
