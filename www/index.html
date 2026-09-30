@@ -882,22 +882,19 @@ async function loadMessages(){
 
 }
 
-function addMessage(message){
+async function addMessage(message){
   const box = document.getElementById("messages");
   if(!box) return;
 
-  const { data: sessionData } = supabaseClient.auth.getSession();
-  sessionData.then(({data})=>{
-    const user = data.session?.user;
-    if(!user) return;
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user) return;
 
-    const div = document.createElement("div");
-    div.className = "msg " + (message.user_id === user.id ? "me" : "other");
-    div.textContent = message.content || "";
+  const div = document.createElement("div");
+  div.className = "msg " + (message.user_id === user.id ? "me" : "other");
+  div.textContent = message.content || "";
 
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-  });
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
 }
 
 async function sendMessage(){
