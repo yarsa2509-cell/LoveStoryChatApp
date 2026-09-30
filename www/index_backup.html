@@ -8,19 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-/* Messenger UI */
-.chatUsers{padding:10px;background:#fff;border-bottom:1px solid #eee}
-.chatUsers h4{margin:4px 8px 10px;font-size:16px}
-#userList{display:flex;gap:8px;overflow-x:auto}
-#userList button{border:0;background:#f0f2f5;padding:9px 14px;border-radius:18px;white-space:nowrap;font-weight:600}
-.chat{background:#fff}
-.messages{padding:12px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:78%;padding:9px 13px;border-radius:18px;background:#f0f2f5;word-wrap:break-word}
-.msg.me{align-self:flex-end;background:#0084ff;color:#fff}
-.input{display:flex;gap:8px;padding:10px;border-top:1px solid #eee;background:#fff}
-.input input{flex:1;border:0;background:#f0f2f5;border-radius:22px;padding:11px 15px;outline:0}
-.input button{border:0;border-radius:20px;padding:0 17px;font-weight:700}
-
 *{box-sizing:border-box}
 
 body{
@@ -231,11 +218,9 @@ placeholder="Password"
 Login
 </button>
 
-<span style="display:none"><button class="switch" onclick="showPhone()">
-📱 Login with Phone</span>
+<button class="switch" onclick="showPhone()">
+📱 Login with Phone
 </button>
-
-<button onclick="loginWithGoogle()">🔵 Continue with Google</button>
 
 </div>
 
@@ -324,8 +309,6 @@ Profile
 
 <br>
 
-<div class="chatUsers"><h4>Chat Users</h4><div id="userList"></div></div>
-
 <button class="logout" onclick="logout()">
 Logout
 </button>
@@ -367,8 +350,6 @@ Send
 
 
 <script>
-async function loginWithGoogle(){const {error}=await supabaseClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)alert(error.message)}
-
 
 const SUPABASE_URL =
 "https://ggeerngrxlpmwgnujqsb.supabase.co";
@@ -560,7 +541,6 @@ async function startApp(){
   }
 
   loadMessages();
-  loadChatUsers();
 
 }
 
@@ -682,62 +662,41 @@ async function saveProfileDetails(){
 
   alert("Profile သိမ်းပြီးပါပြီ ❤️");
 }
-let selectedUserId = null;
-
-async function loadChatUsers(){
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if(!user) return;
-
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("id,name,avatar_url")
-    .neq("id", user.id)
-    .order("name");
-
-  if(error){ console.error(error); return; }
-
-  const list = document.getElementById("userList");
-  list.innerHTML = "";
-
-  data.forEach(profile => {
-    const button = document.createElement("button");
-    button.textContent = profile.name || "User";
-    button.onclick = () => selectChatUser(profile);
-    list.appendChild(button);
-  });
-}
-
-function selectChatUser(profile){
-  selectedUserId = profile.id;
-  document.querySelector(".header").textContent = "❤️ " + (profile.name || "Chat");
-  loadMessages();
-}
-
 async function loadMessages(){
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
+const {
+data,
+error
+} =
+await supabaseClient
+.from("messages")
+.select("*")
+.order(
+"created_at",
+{ascending:true}
+);
 
-  if(!user || !selectedUserId) return;
+if(error){
 
-  const { data, error } = await supabaseClient
-    .from("messages")
-    .select("*")
-    .or(`and(user_id.eq.${user.id},receiver_id.eq.${selectedUserId}),and(user_id.eq.${selectedUserId},receiver_id.eq.${user.id})`)
-    .order("created_at", {ascending:true});
+console.error(error);
 
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  const box = document.getElementById("messages");
-  box.innerHTML = "";
-
-  data.forEach(message => {
-    addMessage(message);
-  });
+return;
 
 }
+
+const box =
+document.getElementById("messages");
+
+box.innerHTML="";
+
+data.forEach(message=>{
+
+addMessage(message);
+
+});
+
+}
+
 
 function addMessage(message){
 
@@ -768,11 +727,6 @@ input.value.trim();
 
 if(!content)return;
 
-if(!selectedUserId){
-  alert("အရင် Chat User တစ်ယောက်ရွေးပါ");
-  return;
-}
-
 const {
 data:userData
 } =
@@ -787,9 +741,7 @@ await supabaseClient
 .insert({
 
 user_id:user.id,
-receiver_id:selectedUserId,
-content:content,
-message_type:"text" 
+content:content
 
 });
 
@@ -817,22 +769,7 @@ table:"messages"
 },
 payload=>{
 
-  supabaseClient.auth.getUser().then(({data:{user}})=>{
-
-    const message = payload.new;
-
-    if(
-      user &&
-      selectedUserId &&
-      (
-        (message.user_id === user.id && message.receiver_id === selectedUserId) ||
-        (message.user_id === selectedUserId && message.receiver_id === user.id)
-      )
-    ){
-      addMessage(message);
-    }
-
-  });
+addMessage(payload.new);
 
 }
 )

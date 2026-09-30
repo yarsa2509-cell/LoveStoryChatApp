@@ -8,19 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-/* Messenger UI */
-.chatUsers{padding:10px;background:#fff;border-bottom:1px solid #eee}
-.chatUsers h4{margin:4px 8px 10px;font-size:16px}
-#userList{display:flex;gap:8px;overflow-x:auto}
-#userList button{border:0;background:#f0f2f5;padding:9px 14px;border-radius:18px;white-space:nowrap;font-weight:600}
-.chat{background:#fff}
-.messages{padding:12px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:78%;padding:9px 13px;border-radius:18px;background:#f0f2f5;word-wrap:break-word}
-.msg.me{align-self:flex-end;background:#0084ff;color:#fff}
-.input{display:flex;gap:8px;padding:10px;border-top:1px solid #eee;background:#fff}
-.input input{flex:1;border:0;background:#f0f2f5;border-radius:22px;padding:11px 15px;outline:0}
-.input button{border:0;border-radius:20px;padding:0 17px;font-weight:700}
-
 *{box-sizing:border-box}
 
 body{
@@ -231,11 +218,9 @@ placeholder="Password"
 Login
 </button>
 
-<span style="display:none"><button class="switch" onclick="showPhone()">
-📱 Login with Phone</span>
+<button class="switch" onclick="showPhone()">
+📱 Login with Phone
 </button>
-
-<button onclick="loginWithGoogle()">🔵 Continue with Google</button>
 
 </div>
 
@@ -367,8 +352,6 @@ Send
 
 
 <script>
-async function loginWithGoogle(){const {error}=await supabaseClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)alert(error.message)}
-
 
 const SUPABASE_URL =
 "https://ggeerngrxlpmwgnujqsb.supabase.co";
