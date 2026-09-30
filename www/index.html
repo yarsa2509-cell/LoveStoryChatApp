@@ -222,6 +222,8 @@ Login
 📱 Login with Phone
 </button>
 
+<button onclick="loginWithGoogle()">🔵 Continue with Google</button>
+
 </div>
 
 
@@ -352,6 +354,8 @@ Send
 
 
 <script>
+async function loginWithGoogle(){const {error}=await supabaseClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:window.location.origin}});if(error)alert(error.message)}
+
 
 const SUPABASE_URL =
 "https://ggeerngrxlpmwgnujqsb.supabase.co";
