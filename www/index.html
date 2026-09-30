@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Love Story Chat</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5f7fb;
+}
+
+.auth{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.auth-box{
+  width:100%;
+  max-width:400px;
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 5px 25px rgba(0,0,0,.1);
+}
+
+.auth-box h1{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.auth-box input{
+  width:100%;
+  padding:14px;
+  margin:8px 0;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:16px;
+}
+
+.auth-box button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border:0;
+  border-radius:10px;
+  background:#6c63ff;
+  color:white;
+  font-size:16px;
+}
+
+.switch{
+  background:white!important;
+  color:#6c63ff!important;
+  border:1px solid #6c63ff!important;
+}
+
+#otpForm{
+  display:none;
+}
+
+#app{
+  display:none;
+  min-height:100vh;
+}
+
+.app{
+  display:flex;
+  min-height:100vh;
+}
+
+.sidebar{
+  width:280px;
+  background:white;
+  border-right:1px solid #ddd;
+  padding:20px;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+.profile{
+  text-align:center;
+  padding:15px;
+  background:#f5f5ff;
+  border-radius:15px;
+}
+
+.avatar{
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.chat{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+.header{
+  background:white;
+  padding:16px 20px;
+  border-bottom:1px solid #ddd;
+  font-weight:bold;
+}
+
+.messages{
+  flex:1;
+  padding:20px;
+  overflow:auto;
+}
+
+.msg{
+  max-width:70%;
+  padding:11px 15px;
+  border-radius:18px;
+  margin:8px 0;
+  background:white;
+  border:1px solid #ddd;
+}
+
+.input{
+  display:flex;
+  padding:15px;
+  background:white;
+  border-top:1px solid #ddd;
+}
+
+.input input{
+  flex:1;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:22px;
+  outline:none;
+}
+
+.input button{
+  margin-left:8px;
+  border:0;
+  border-radius:22px;
+  padding:0 20px;
+  background:#6c63ff;
+  color:white;
+}
+
+.logout{
+  margin-top:10px;
+  padding:10px 20px;
+  border:0;
+  border-radius:20px;
+  background:#ff4f81;
+  color:white;
+}
+
+@media(max-width:600px){
+  .sidebar{
+    width:110px;
+    padding:10px;
+  }
+
+  .logo{
+    font-size:14px;
+  }
+
+  .profile h3,
+  .profile p{
+    font-size:11px;
+  }
+
+  .avatar{
+    width:55px;
+    height:55px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="auth" class="auth">
+
+<div class="auth-box">
+
+<h1>❤️ Love Story</h1>
+
+<div id="loginForm">
+
+<h2>Login</h2>
+
+<input
+id="loginEmail"
+type="email"
+placeholder="Email"
+>
+
+<input
+id="loginPassword"
+type="password"
+placeholder="Password"
+>
+
+<button onclick="login()">
+Login
+</button>
+
+<button class="switch" onclick="showPhone()">
+📱 Login with Phone
+</button>
+
+</div>
+
+
+<div id="otpForm">
+
+<h2>📱 Phone Login</h2>
+
+<input
+id="phone"
+type="tel"
+placeholder="+66812345678"
+>
+
+<button onclick="sendOTP()">
+Send OTP
+</button>
+
+<input
+id="otp"
+type="text"
+inputmode="numeric"
+maxlength="6"
+placeholder="Enter 6-digit OTP"
+>
+
+<button onclick="verifyOTP()">
+Verify OTP
+</button>
+
+<button class="switch" onclick="showLogin()">
+Back to Email Login
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<div id="app">
+
+<div class="app">
+
+<aside class="sidebar">
+
+<div class="logo">
+❤️ Love Story
+</div>
+
+<div class="profile">
+
+<img
+class="avatar"
+src="https://via.placeholder.com/100"
+>
+
+<h3 id="profileName">
+My Profile
+</h3>
+
+<div class="profileInfo">
+  <input type="file" id="avatarInput" accept="image/*">
+
+  <label>မွေးနေ့</label>
+  <input type="date" id="birthdayInput">
+
+  <label>Gender</label>
+  <select id="genderInput">
+    <option value="">ရွေးပါ</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="other">Other</option>
+  </select>
+
+  <button onclick="saveProfileDetails()">Save Profile</button>
+</div>
+
+<p id="profileInfo">
+Phone User
+</p>
+
+<button onclick="openProfile()">
+Profile
+</button>
+
+<br>
+
+<button class="logout" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</aside>
+
+
+<main class="chat">
+
+<div class="header">
+❤️ Love Story Chat
+</div>
+
+<div
+id="messages"
+class="messages">
+</div>
+
+<div class="input">
+
+<input
+id="messageInput"
+placeholder="Type a message..."
+>
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+</div>
+
+</main>
+
+</div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+"https://ggeerngrxlpmwgnujqsb.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_HV5s-ma1aCh1hMSZI686lw_JiX66gpC";
+
+const supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_PUBLISHABLE_KEY
+);
+
+
+function showPhone(){
+
+document.getElementById("loginForm")
+.style.display="none";
+
+document.getElementById("otpForm")
+.style.display="block";
+
+}
+
+
+function showLogin(){
+
+document.getElementById("otpForm")
+.style.display="none";
+
+document.getElementById("loginForm")
+.style.display="block";
+
+}
+
+
+async function sendOTP(){
+
+const phone =
+document.getElementById("phone")
+.value.trim();
+
+if(!phone){
+
+alert("ဖုန်းနံပါတ်ထည့်ပါ");
+
+return;
+
+}
+
+const {error} =
+await supabaseClient.auth.signInWithOtp({
+phone:phone
+});
+
+if(error){
+
+alert(
+"OTP ပို့မရပါ:\n"+
+error.message
+);
+
+return;
+
+}
+
+alert("OTP ပို့ပြီးပါပြီ 📱");
+
+}
+
+
+async function verifyOTP(){
+
+const phone =
+document.getElementById("phone")
+.value.trim();
+
+const token =
+document.getElementById("otp")
+.value.trim();
+
+if(!phone || !token){
+
+alert("Phone Number နဲ့ OTP ထည့်ပါ");
+
+return;
+
+}
+
+const {data,error} =
+await supabaseClient.auth.verifyOtp({
+
+phone:phone,
+token:token,
+type:"sms"
+
+});
+
+if(error){
+
+alert(
+"OTP မှားနေပါတယ်:\n"+
+error.message
+);
+
+return;
+
+}
+
+if(data.session){
+
+startApp();
+
+}
+
+}
+
+
+async function login(){
+
+const email =
+document.getElementById("loginEmail")
+.value.trim();
+
+const password =
+document.getElementById("loginPassword")
+.value;
+
+if(!email || !password){
+
+alert("Email နဲ့ Password ထည့်ပါ");
+
+return;
+
+}
+
+const {data,error} =
+await supabaseClient.auth.signInWithPassword({
+
+email:email,
+password:password
+
+});
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+startApp();
+
+}
+
+async function startApp(){
+
+  document.getElementById("auth")
+    .style.display="none";
+
+  document.getElementById("app")
+    .style.display="block";
+
+  const { data, error } =
+    await supabaseClient
+      .from("profiles")
+      .select("name,birthday,gender,avatar_url")
+      .eq("id", (await supabaseClient.auth.getUser()).data.user.id)
+      .maybeSingle();
+
+  if(data){
+    if(data.name){
+      document.getElementById("profileName")
+        .textContent = data.name;
+    }
+
+    if(data.birthday){
+      document.getElementById("birthdayInput").value = data.birthday;
+    }
+
+    if(data.gender){
+      document.getElementById("genderInput").value = data.gender;
+    }
+
+    if(data.avatar_url){
+      document.querySelector(".avatar").src = data.avatar_url;
+    }
+  }
+
+  loadMessages();
+
+}
+
+async function logout(){
+
+await supabaseClient.auth.signOut();
+
+document.getElementById("app")
+.style.display="none";
+
+document.getElementById("auth")
+.style.display="flex";
+
+showLogin();
+
+}
+
+
+
+async function openProfile(){
+
+  const user =
+    (await supabaseClient.auth.getUser()).data.user;
+
+  if(!user){
+    alert("အရင် Login ဝင်ပါ");
+    return;
+  }
+
+  const name = prompt("နာမည်ထည့်ပါ:");
+
+  if(!name) return;
+
+  const { error } =
+    await supabaseClient
+      .from("profiles")
+      .upsert({
+        id: user.id,
+        name: name
+      });
+
+  if(error){
+    alert("Profile သိမ်းမရပါ:\n" + error.message);
+    return;
+  }
+
+  document.getElementById("profileName")
+    .textContent = name;
+
+  alert("Profile သိမ်းပြီးပါပြီ ❤️");
+}
+async function saveProfileDetails(){
+
+  const { data: { user } } =
+    await supabaseClient.auth.getUser();
+
+  if(!user){
+    alert("အရင် Login ဝင်ပါ");
+    return;
+  }
+
+  const birthday =
+    document.getElementById("birthdayInput").value;
+
+  const gender =
+    document.getElementById("genderInput").value;
+
+  const file =
+    document.getElementById("avatarInput").files[0];
+
+  let avatar_url = null;
+
+  if(file){
+
+    const fileName =
+      user.id + "_" + Date.now() + "_" + file.name;
+
+    const { error } =
+      await supabaseClient.storage
+        .from("avatars")
+        .upload(fileName, file);
+
+    if(error){
+      alert("Photo သိမ်းမရပါ:\n" + error.message);
+      return;
+    }
+
+    const { data } =
+      supabaseClient.storage
+        .from("avatars")
+        .getPublicUrl(fileName);
+
+    avatar_url = data.publicUrl;
+  }
+
+  const profile = {
+    id: user.id,
+    birthday: birthday || null,
+    gender: gender || null
+  };
+
+  if(avatar_url){
+    profile.avatar_url = avatar_url;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("profiles")
+      .upsert(profile);
+
+  if(error){
+    alert("Profile သိမ်းမရပါ:\n" + error.message);
+    return;
+  }
+
+  if(avatar_url){
+    document.querySelector(".avatar").src = avatar_url;
+  }
+
+  alert("Profile သိမ်းပြီးပါပြီ ❤️");
+}
+async function loadMessages(){
+
+const {
+data,
+error
+} =
+await supabaseClient
+.from("messages")
+.select("*")
+.order(
+"created_at",
+{ascending:true}
+);
+
+if(error){
+
+console.error(error);
+
+return;
+
+}
+
+const box =
+document.getElementById("messages");
+
+box.innerHTML="";
+
+data.forEach(message=>{
+
+addMessage(message);
+
+});
+
+}
+
+
+function addMessage(message){
+
+const div =
+document.createElement("div");
+
+div.className="msg";
+
+div.textContent =
+message.content;
+
+document.getElementById(
+"messages"
+).appendChild(div);
+
+}
+
+
+async function sendMessage(){
+
+const input =
+document.getElementById(
+"messageInput"
+);
+
+const content =
+input.value.trim();
+
+if(!content)return;
+
+const {
+data:userData
+} =
+await supabaseClient.auth.getUser();
+
+const user =
+userData.user;
+
+const {error} =
+await supabaseClient
+.from("messages")
+.insert({
+
+user_id:user.id,
+content:content
+
+});
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+input.value="";
+
+}
+
+
+supabaseClient
+.channel("messages-realtime")
+.on(
+"postgres_changes",
+{
+event:"INSERT",
+schema:"public",
+table:"messages"
+},
+payload=>{
+
+addMessage(payload.new);
+
+}
+)
+.subscribe();
+
+
+supabaseClient.auth
+.onAuthStateChange(
+(event,session)=>{
+
+if(session){
+
+startApp();
+
+}
+
+});
+
+
+supabaseClient.auth
+.getSession()
+.then(({data})=>{
+
+if(data.session){
+
+startApp();
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
