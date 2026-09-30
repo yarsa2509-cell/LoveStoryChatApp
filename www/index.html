@@ -6,84 +6,7 @@
 <title>Love Stroy</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-supabaseClient.channel("messages-realtime")
-  .on(
-    "postgres_changes",
-    {
-      event:"INSERT",
-      schema:"public",
-      table:"messages"
-    },
-    async payload=>{
-      const {data:{user}} =
-        await supabaseClient.auth.getUser();
 
-      const message=payload.new;
-
-      if(
-        user &&
-        selectedUserId &&
-        (
-          (message.user_id===user.id &&
-           message.receiver_id===selectedUserId) ||
-          (message.user_id===selectedUserId &&
-           message.receiver_id===user.id)
-        )
-      ){
-        const box=document.getElementById("messages");
-
-        if(
-          message.id &&
-          box &&
-          box.querySelector(
-            `[data-message-id="${message.id}"]`
-          )
-        ){
-          return;
-        }
-
-        await addMessage(message);
-        await loadChatUsers();
-
-        if(box){
-          requestAnimationFrame(()=>{
-            box.scrollTop=box.scrollHeight;
-          });
-        }
-      }
-    }
-  )
-  .on(
-    "postgres_changes",
-    {
-      event:"UPDATE",
-      schema:"public",
-      table:"messages"
-    },
-    async payload=>{
-      const message=payload.new;
-      const box=document.getElementById("messages");
-
-      if(!box || !message.id) return;
-
-      const item=box.querySelector(
-        `[data-message-id="${message.id}"]`
-      );
-
-      if(!item) return;
-
-      const seen=item.querySelector(".msgSeen");
-
-      if(seen && message.seen){
-        seen.textContent="✓✓";
-      }
-    }
-  )
-  .subscribe();
-});
-</script>
 
 <style>
 /* Messenger UI */
@@ -1085,6 +1008,83 @@ window.supabase.createClient(
 SUPABASE_URL,
 SUPABASE_PUBLISHABLE_KEY
 );
+
+document.addEventListener("DOMContentLoaded",()=>{
+supabaseClient.channel("messages-realtime")
+  .on(
+    "postgres_changes",
+    {
+      event:"INSERT",
+      schema:"public",
+      table:"messages"
+    },
+    async payload=>{
+      const {data:{user}} =
+        await supabaseClient.auth.getUser();
+
+      const message=payload.new;
+
+      if(
+        user &&
+        selectedUserId &&
+        (
+          (message.user_id===user.id &&
+           message.receiver_id===selectedUserId) ||
+          (message.user_id===selectedUserId &&
+           message.receiver_id===user.id)
+        )
+      ){
+        const box=document.getElementById("messages");
+
+        if(
+          message.id &&
+          box &&
+          box.querySelector(
+            `[data-message-id="${message.id}"]`
+          )
+        ){
+          return;
+        }
+
+        await addMessage(message);
+        await loadChatUsers();
+
+        if(box){
+          requestAnimationFrame(()=>{
+            box.scrollTop=box.scrollHeight;
+          });
+        }
+      }
+    }
+  )
+  .on(
+    "postgres_changes",
+    {
+      event:"UPDATE",
+      schema:"public",
+      table:"messages"
+    },
+    async payload=>{
+      const message=payload.new;
+      const box=document.getElementById("messages");
+
+      if(!box || !message.id) return;
+
+      const item=box.querySelector(
+        `[data-message-id="${message.id}"]`
+      );
+
+      if(!item) return;
+
+      const seen=item.querySelector(".msgSeen");
+
+      if(seen && message.seen){
+        seen.textContent="✓✓";
+      }
+    }
+  )
+  .subscribe();
+});
 
 
 function showPhone(){
