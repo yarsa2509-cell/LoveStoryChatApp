@@ -3,9 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Love Story Chat</title>
+<title>Love Stroy</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+supabaseClient.channel("messages-realtime")
+  .on(
+    "postgres_changes",
+    {
+      event:"INSERT",
+      schema:"public",
+      table:"messages"
+    },
+    async payload=>{
+      const {data:{user}} =
+        await supabaseClient.auth.getUser();
+
+      const message=payload.new;
+
+      if(
+        user &&
+        selectedUserId &&
+        (
+          (message.user_id===user.id &&
+           message.receiver_id===selectedUserId) ||
+          (message.user_id===selectedUserId &&
+           message.receiver_id===user.id)
+        )
+      ){
+        const box=document.getElementById("messages");
+
+        if(
+          message.id &&
+          box &&
+          box.querySelector(
+            `[data-message-id="${message.id}"]`
+          )
+        ){
+          return;
+        }
+
+        await addMessage(message);
+        await loadChatUsers();
+
+        if(box){
+          requestAnimationFrame(()=>{
+            box.scrollTop=box.scrollHeight;
+          });
+        }
+      }
+    }
+  )
+  .on(
+    "postgres_changes",
+    {
+      event:"UPDATE",
+      schema:"public",
+      table:"messages"
+    },
+    async payload=>{
+      const message=payload.new;
+      const box=document.getElementById("messages");
+
+      if(!box || !message.id) return;
+
+      const item=box.querySelector(
+        `[data-message-id="${message.id}"]`
+      );
+
+      if(!item) return;
+
+      const seen=item.querySelector(".msgSeen");
+
+      if(seen && message.seen){
+        seen.textContent="✓✓";
+      }
+    }
+  )
+  .subscribe();
+});
+
+
+
 
 <style>
 /* Messenger UI */
@@ -554,6 +634,38 @@ body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif}
 </style>
 
 <style>
+#searchResults{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  margin-bottom:6px;
+}
+
+.searchUserItem{
+  background:#fff!important;
+  border-bottom:1px solid #eee!important;
+}
+
+.searchUserItem:active{
+  background:#f0f2f5!important;
+}
+
+.ls-chat-top{
+  background:#fff;
+}
+
+.userSearch{
+  width:100%;
+  box-sizing:border-box;
+  border:0;
+  outline:0;
+  background:#f0f2f5;
+  border-radius:22px;
+  padding:11px 16px;
+  font-size:15px;
+  margin:0 0 10px;
+}
+
 #userList{
   display:flex!important;
   flex-direction:column!important;
@@ -621,7 +733,7 @@ body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif}
 
 <div class="auth-box">
 
-<h1>❤️ Love Story</h1>
+<h1>Love Stroy</h1>
 
 <div id="loginForm">
 
@@ -745,7 +857,19 @@ Profile
 <br>
 
 <div class="chatUsers">
-  <div class="chatTitle">Chats</div>
+  <div class="ls-chat-top">
+    <div class="chatTitle">Chats</div>
+    <input
+      id="userSearch"
+      class="userSearch"
+      type="search"
+      placeholder="Search account"
+      autocomplete="off"
+      oninput="searchUsers()"
+    >
+  </div>
+
+  <div id="searchResults" class="searchResults"></div>
   <div id="userList"></div>
 </div>
 
@@ -761,7 +885,7 @@ Logout
 <main class="chat">
 
 <div class="header">
-  <div class="headerAvatar">❤️</div>
+  <div class="headerAvatar">LS</div>
   <div>
     <div class="headerName">Love Story Chat</div>
     <div class="headerStatus">Online</div>
@@ -1261,7 +1385,7 @@ async function loadChatUsers(){
 
   const {data:messages,error}=await supabaseClient
     .from("messages")
-    .select("user_id,receiver_id,content,created_at")
+    .select("user_id,receiver_id,content,created_at,message_type")
     .or(`user_id.eq.${user.id},receiver_id.eq.${user.id}`)
     .order("created_at",{ascending:false});
 
@@ -1270,18 +1394,23 @@ async function loadChatUsers(){
     return;
   }
 
-  const ids=[];
+  const conversations=new Map();
 
-  (messages || []).forEach(m=>{
-    const other=m.user_id===user.id ? m.receiver_id : m.user_id;
-    if(other && !ids.includes(other)){
-      ids.push(other);
+  (messages || []).forEach(message=>{
+    const otherId =
+      message.user_id === user.id
+        ? message.receiver_id
+        : message.user_id;
+
+    if(otherId && !conversations.has(otherId)){
+      conversations.set(otherId,message);
     }
   });
 
+  const ids=[...conversations.keys()];
   const list=document.getElementById("userList");
-  if(!list) return;
 
+  if(!list) return;
   list.innerHTML="";
 
   if(ids.length===0){
@@ -1303,13 +1432,16 @@ async function loadChatUsers(){
   }
 
   const profileMap={};
-  (profiles || []).forEach(p=>{
-    profileMap[p.id]=p;
+
+  (profiles || []).forEach(profile=>{
+    profileMap[profile.id]=profile;
   });
 
   ids.forEach(id=>{
     const profile=profileMap[id];
-    if(!profile) return;
+    const last=conversations.get(id);
+
+    if(!profile || !last) return;
 
     const button=document.createElement("button");
     button.className="chatUserItem";
@@ -1326,13 +1458,14 @@ async function loadChatUsers(){
     name.className="chatUserName";
     name.textContent=profile.name || "User";
 
-    const last=messages.find(m=>
-      m.user_id===id || m.receiver_id===id
-    );
-
     const preview=document.createElement("div");
     preview.className="chatPreview";
-    preview.textContent=last ? (last.content || "Media") : "";
+
+    if(last.message_type === "text"){
+      preview.textContent=last.content || "";
+    }else{
+      preview.textContent="Media";
+    }
 
     info.appendChild(name);
     info.appendChild(preview);
@@ -1340,8 +1473,78 @@ async function loadChatUsers(){
     button.appendChild(avatar);
     button.appendChild(info);
 
-    button.onclick=()=>selectChatUser(profile);
+    button.onclick=()=>{
+      selectChatUser(profile);
+    };
+
     list.appendChild(button);
+  });
+}
+
+async function searchUsers(){
+  const input=document.getElementById("userSearch");
+  const results=document.getElementById("searchResults");
+
+  if(!input || !results) return;
+
+  const keyword=input.value.trim();
+
+  results.innerHTML="";
+
+  if(!keyword){
+    return;
+  }
+
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user) return;
+
+  const {data,error}=await supabaseClient
+    .from("public_profiles")
+    .select("id,name,avatar_url")
+    .neq("id",user.id)
+    .eq("name",keyword)
+    .order("name");
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  if(!data || data.length===0){
+    const empty=document.createElement("div");
+    empty.className="emptyChats";
+    empty.textContent="Account မတွေ့ပါ";
+    results.appendChild(empty);
+    return;
+  }
+
+  data.forEach(profile=>{
+    const item=document.createElement("button");
+    item.className="chatUserItem searchUserItem";
+
+    const avatar=document.createElement("img");
+    avatar.className="chatUserAvatar";
+    avatar.src=profile.avatar_url || "https://via.placeholder.com/50";
+    avatar.alt="";
+
+    const info=document.createElement("div");
+    info.className="chatUserInfo";
+
+    const name=document.createElement("div");
+    name.className="chatUserName";
+    name.textContent=profile.name || "User";
+
+    info.appendChild(name);
+    item.appendChild(avatar);
+    item.appendChild(info);
+
+    item.onclick=()=>{
+      results.innerHTML="";
+      input.value="";
+      selectChatUser(profile);
+    };
+
+    results.appendChild(item);
   });
 }
 
@@ -1372,7 +1575,7 @@ function selectChatUser(profile){
       img.style.objectFit = "cover";
       headerAvatar.appendChild(img);
     }else{
-      headerAvatar.textContent = "❤️";
+      headerAvatar.textContent = "LS";
     }
   }
 
@@ -1420,8 +1623,16 @@ async function addMessage(message){
   const { data: { user } } = await supabaseClient.auth.getUser();
   if(!user) return;
 
+  if(message.id && box.querySelector(`[data-message-id="${message.id}"]`)){
+    return;
+  }
+
   const div = document.createElement("div");
   div.className = "msg " + (message.user_id === user.id ? "me" : "other");
+
+  if(message.id){
+    div.dataset.messageId = message.id;
+  }
 
   const text = document.createElement("div");
   text.textContent = message.content || "";
@@ -1452,11 +1663,12 @@ async function addMessage(message){
   div.appendChild(text);
   div.appendChild(meta);
   box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
 }
 
 async function sendMessage(){
   const input = document.getElementById("messageInput");
+  if(!input) return;
+
   const content = input.value.trim();
 
   if(!content) return;
@@ -1466,167 +1678,3 @@ async function sendMessage(){
     return;
   }
 
-  const {data:{user}} = await supabaseClient.auth.getUser();
-
-  if(!user) return;
-
-  const {data:message,error} = await supabaseClient
-    .from("messages")
-    .insert({
-      user_id:user.id,
-      receiver_id:selectedUserId,
-      content:content,
-      message_type:"text"
-    })
-    .select()
-    .single();
-
-  if(error){
-    alert(error.message);
-    return;
-  }
-
-  input.value = "";
-
-  addMessage(message);
-}
-
-supabaseClient
-.channel("messages-realtime")
-.on(
-  "postgres_changes",
-  {
-    event:"INSERT",
-    schema:"public",
-    table:"messages"
-  },
-  async payload=>{
-    const {data:{user}} = await supabaseClient.auth.getUser();
-    const message = payload.new;
-
-    if(
-      user &&
-      selectedUserId &&
-      (
-        (message.user_id === user.id && message.receiver_id === selectedUserId) ||
-        (message.user_id === selectedUserId && message.receiver_id === user.id)
-      )
-    ){
-      const box = document.getElementById("messages");
-
-      if(message.user_id === user.id &&
-         [...box.children].some(x => x.textContent === message.content)){
-        return;
-      }
-
-      addMessage(message);
-    }
-  }
-)
-.subscribe();
-
-
-supabaseClient.auth
-.onAuthStateChange(
-(event,session)=>{
-
-if(session){
-
-startApp();
-
-}
-
-});
-
-
-supabaseClient.auth
-.getSession()
-.then(({data})=>{
-
-if(data.session){
-
-startApp();
-
-}
-
-});
-
-</script>
-
-
-<script>
-function lsNav(section,button){
-
-  document.querySelectorAll(".ls-nav-btn")
-    .forEach(x=>x.classList.remove("active"));
-
-  if(button){
-    button.classList.add("active");
-  }
-
-  if(section==="chats"){
-    document.querySelector(".chatUsers")?.style.setProperty("display","block");
-    document.querySelector(".messages")?.style.setProperty("display","flex");
-    document.querySelector(".input")?.style.setProperty("display","flex");
-  }
-
-  if(section==="people"){
-    alert("People section ကို နောက်တစ်ဆင့်မှာ ထည့်ပေးမယ်");
-  }
-
-  if(section==="notifications"){
-    alert("Notifications section ကို နောက်တစ်ဆင့်မှာ ထည့်ပေးမယ်");
-  }
-
-  if(section==="menu"){
-    openLoveMenu();
-    return;
-  }
-}
-</script>
-
-<div id="lsMenuPanel">
-  <div class="ls-menu-head">Menu</div>
-
-  <div class="ls-menu-user">
-    <div class="ls-menu-avatar">👤</div>
-    <div>
-      <div id="lsMenuName" class="ls-menu-name">LoveStoryChat</div>
-      <div class="ls-menu-sub">Your profile</div>
-    </div>
-  </div>
-
-  <button class="ls-menu-item" onclick="alert('Switch profile')">🔄 Switch profile</button>
-  <button class="ls-menu-item" onclick="alert('Settings')">⚙️ Settings</button>
-  <button class="ls-menu-item" onclick="alert('Communities')">👥 Communities</button>
-  <button class="ls-menu-item" onclick="alert('Message requests')">✉️ Message requests</button>
-  <button class="ls-menu-item" onclick="alert('Archive')">📦 Archive</button>
-  <button class="ls-menu-item" onclick="alert('Blocked accounts')">🚫 Blocked accounts</button>
-</div>
-
-<script>
-function openLoveMenu(){
-  const panel=document.getElementById("lsMenuPanel");
-  if(panel) panel.classList.add("active");
-}
-
-function closeLoveMenu(){
-  document.getElementById("lsMenuPanel")?.classList.remove("active");
-}
-</script>
-</body>
-</html>
-<style>
-.msg.me{
-  align-self:flex-end;
-  background:#0084ff;
-  color:#fff;
-  border-radius:18px 18px 4px 18px;
-}
-.msg.other{
-  align-self:flex-start;
-  background:#fff;
-  color:#111;
-  border-radius:18px 18px 18px 4px;
-}
-</style>
