@@ -83,9 +83,7 @@ supabaseClient.channel("messages-realtime")
   )
   .subscribe();
 });
-
-
-
+</script>
 
 <style>
 /* Messenger UI */
@@ -1584,29 +1582,29 @@ function selectChatUser(profile){
 
 async function loadMessages(){
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
+  const { data: { user } } =
+    await supabaseClient.auth.getUser();
 
   if(!user || !selectedUserId) return;
 
-  const { data, error } = await supabaseClient
-    .from("messages")
-    .select("*")
-    .or(`and(user_id.eq.${user.id},receiver_id.eq.${selectedUserId}),and(user_id.eq.${selectedUserId},receiver_id.eq.${user.id})`)
-    .order("created_at", {ascending:true});
+  const { data, error } =
+    await supabaseClient
+      .from("messages")
+      .select("*")
+      .or(
+        `and(user_id.eq.${user.id},receiver_id.eq.${selectedUserId}),and(user_id.eq.${selectedUserId},receiver_id.eq.${user.id})`
+      )
+      .order("created_at", {ascending:true});
 
   if(error){
     console.error(error);
     return;
   }
 
-  const box = document.getElementById("messages");
-  box.innerHTML = "";
+  const box=document.getElementById("messages");
+  if(!box) return;
 
-  data.forEach(message => {
-    addMessage(message);
-  });
-
-  // Mark incoming messages as seen
+  // Mark received messages as seen before rendering.
   await supabaseClient
     .from("messages")
     .update({seen:true})
@@ -1614,6 +1612,23 @@ async function loadMessages(){
     .eq("user_id", selectedUserId)
     .eq("seen", false);
 
+  box.innerHTML="";
+
+  for(const message of (data || [])){
+    if(
+      message.receiver_id === user.id &&
+      message.user_id === selectedUserId
+    ){
+      message.seen=true;
+    }
+
+    await addMessage(message);
+  }
+
+  // Scroll only once after all messages are rendered.
+  requestAnimationFrame(()=>{
+    box.scrollTop=box.scrollHeight;
+  });
 }
 
 async function addMessage(message){
@@ -1666,10 +1681,11 @@ async function addMessage(message){
 }
 
 async function sendMessage(){
-  const input = document.getElementById("messageInput");
+
+  const input=document.getElementById("messageInput");
   if(!input) return;
 
-  const content = input.value.trim();
+  const content=input.value.trim();
 
   if(!content) return;
 
@@ -1677,4 +1693,48 @@ async function sendMessage(){
     alert("အရင် Chat User တစ်ယောက်ရွေးပါ");
     return;
   }
+
+  const {data:{user}} =
+    await supabaseClient.auth.getUser();
+
+  if(!user) return;
+
+  // Clear immediately so the same text cannot be submitted twice.
+  input.value="";
+  input.disabled=true;
+
+  const {data:message,error} =
+    await supabaseClient
+      .from("messages")
+      .insert({
+        user_id:user.id,
+        receiver_id:selectedUserId,
+        content:content,
+        message_type:"text"
+      })
+      .select()
+      .single();
+
+  input.disabled=false;
+  input.focus();
+
+  if(error){
+    input.value=content;
+    alert(error.message);
+    return;
+  }
+
+  await addMessage(message);
+
+  const box=document.getElementById("messages");
+
+  if(box){
+    requestAnimationFrame(()=>{
+      box.scrollTop=box.scrollHeight;
+    });
+  }
+
+  await loadChatUsers();
+}
+
 
