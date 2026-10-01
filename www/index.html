@@ -687,6 +687,36 @@ body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif}
 </style>
 
 <style>
+/* Love Story login branding */
+.login-brand{
+  text-align:center;
+  margin-bottom:20px;
+}
+.login-logo{
+  width:82px;
+  height:82px;
+  margin:0 auto 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:24px;
+  background:linear-gradient(135deg,#24104f,#8b1fa9,#ff3f9f);
+  box-shadow:0 10px 30px rgba(180,40,180,.35);
+  font-size:42px;
+}
+.login-brand h1{
+  margin:0;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-.5px;
+  color:#fff;
+}
+.login-brand p{
+  margin:6px 0 0;
+  font-size:13px;
+  color:#ff65b5;
+  font-weight:600;
+}
 /* Phone-only login screen */
 html,body{
   width:100%;
@@ -1022,6 +1052,474 @@ body{
 }
 
 </style>
+
+<style>
+/* LOVE STORY CHAT — PREMIUM DARK UI */
+body{
+  background:#09050f !important;
+  color:#fff;
+}
+
+.app{
+  background:linear-gradient(135deg,#09050f,#160822 55%,#09050f) !important;
+}
+
+.chatUsers,
+.chat,
+.header,
+.input{
+  background:rgba(18,10,28,.94) !important;
+  color:#fff !important;
+  border-color:rgba(255,70,180,.18) !important;
+}
+
+.chatUsers{
+  box-shadow:inset -1px 0 rgba(255,50,180,.12);
+}
+
+.ls-chat-top{
+  background:transparent !important;
+}
+
+.chatTitle,
+.headerName,
+.chatUserName{
+  color:#fff !important;
+}
+
+.userSearch,
+.input input{
+  background:rgba(255,255,255,.08) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,70,180,.18) !important;
+}
+
+.userSearch::placeholder,
+.input input::placeholder,
+.chatPreview{
+  color:#aaa !important;
+}
+
+.chatUserItem{
+  background:transparent !important;
+  color:#fff !important;
+  border-radius:16px !important;
+  transition:.2s ease;
+}
+
+.chatUserItem:active,
+.chatUserItem:hover{
+  background:rgba(255,45,170,.10) !important;
+}
+
+.chatUserAvatar,
+.headerAvatar{
+  border:2px solid #ff3fae !important;
+  box-shadow:0 0 14px rgba(255,45,170,.35);
+}
+
+.header{
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+}
+
+.headerStatus{
+  color:#ff65bb !important;
+}
+
+.messages{
+  background:linear-gradient(180deg,#0b0611,#120719) !important;
+}
+
+.input{
+  box-shadow:0 -5px 20px rgba(0,0,0,.3);
+}
+
+.input button,
+.chat-tool-btn{
+  background:linear-gradient(135deg,#ff2fa4,#8b35ff) !important;
+  color:#fff !important;
+  box-shadow:0 0 14px rgba(255,45,170,.25);
+}
+
+.ls-bottom-nav{
+  background:rgba(14,7,22,.96) !important;
+  border:1px solid rgba(255,70,180,.18) !important;
+  box-shadow:0 -5px 25px rgba(0,0,0,.35),0 0 20px rgba(180,40,255,.12);
+}
+
+.ls-nav-btn{
+  color:#999 !important;
+}
+
+.ls-nav-btn.active{
+  color:#ff4db3 !important;
+  text-shadow:0 0 12px rgba(255,50,180,.7);
+}
+
+.ls-nav-btn.active span:first-child{
+  filter:drop-shadow(0 0 6px #ff3fae);
+}
+</style>
+
+
+<style>
+/* Love Story sidebar branding */
+.logo{
+  display:flex !important;
+  align-items:center;
+  gap:10px;
+  padding:14px 12px !important;
+  color:#fff !important;
+  font-size:22px !important;
+  font-weight:800 !important;
+  letter-spacing:-.4px;
+}
+
+.logo-mark{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  background:linear-gradient(135deg,#ff2fa4,#9b35ff);
+  color:#fff;
+  font-size:30px;
+  line-height:1;
+  box-shadow:0 0 22px rgba(255,45,170,.45);
+}
+
+.logo-text{
+  color:#fff;
+}
+
+.logo-text b{
+  color:#ff4db3;
+  text-shadow:0 0 12px rgba(255,55,180,.65);
+}
+</style>
+
+
+<style>
+/* Love Story Messenger-style chat list */
+.chatUsers{
+  padding:8px 10px 90px !important;
+}
+
+.ls-chat-top{
+  padding:10px 6px 14px !important;
+}
+
+.chatTitle{
+  font-size:24px !important;
+  font-weight:800 !important;
+  margin-bottom:12px !important;
+}
+
+.userSearch{
+  width:100% !important;
+  min-height:44px !important;
+  padding:0 16px !important;
+  border-radius:22px !important;
+  box-sizing:border-box !important;
+  outline:none !important;
+}
+
+#userList{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.chatUserItem{
+  width:100% !important;
+  min-height:68px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:9px 10px !important;
+  border-radius:16px !important;
+  background:transparent !important;
+}
+
+.chatUserItem:hover{
+  background:rgba(255,55,180,.08) !important;
+}
+
+.chatUserAvatar{
+  width:52px !important;
+  height:52px !important;
+  min-width:52px !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+}
+
+.chatUserInfo{
+  flex:1 !important;
+  min-width:0 !important;
+}
+
+.chatUserName{
+  font-size:16px !important;
+  font-weight:700 !important;
+  color:#fff !important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.chatPreview{
+  margin-top:4px !important;
+  font-size:13px !important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.chatUserTime{
+  color:#999 !important;
+  font-size:11px !important;
+  white-space:nowrap;
+}
+</style>
+
+
+<style>
+/* Love Story Messenger-style chat header */
+.header{
+  min-height:64px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:8px 14px !important;
+  box-sizing:border-box !important;
+  background:rgba(14,7,22,.96) !important;
+  border-bottom:1px solid rgba(255,70,180,.15) !important;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+
+.headerAvatar{
+  width:46px !important;
+  height:46px !important;
+  min-width:46px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:50% !important;
+  background:linear-gradient(135deg,#ff2fa4,#8b35ff) !important;
+  color:#fff !important;
+  font-weight:800 !important;
+  font-size:14px !important;
+}
+
+.headerName{
+  font-size:16px !important;
+  font-weight:750 !important;
+  color:#fff !important;
+  line-height:1.25;
+}
+
+.headerStatus{
+  margin-top:2px !important;
+  font-size:12px !important;
+  color:#ff65bb !important;
+}
+
+.headerStatus::before{
+  content:"";
+  display:inline-block;
+  width:7px;
+  height:7px;
+  margin-right:5px;
+  border-radius:50%;
+  background:#45e68a;
+  box-shadow:0 0 8px rgba(69,230,138,.8);
+}
+</style>
+
+
+<style>
+/* Love Story modern message composer */
+.input{
+  min-height:64px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding:9px 10px !important;
+  box-sizing:border-box !important;
+  background:rgba(12,6,18,.98) !important;
+  border-top:1px solid rgba(255,70,180,.15) !important;
+}
+
+.chat-tools{
+  display:flex !important;
+  align-items:center !important;
+  gap:5px !important;
+  flex-shrink:0 !important;
+}
+
+.chat-tool-btn{
+  width:40px !important;
+  height:40px !important;
+  min-width:40px !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border:0 !important;
+  border-radius:50% !important;
+  font-size:19px !important;
+}
+
+.input input{
+  flex:1 !important;
+  min-width:0 !important;
+  height:44px !important;
+  padding:0 16px !important;
+  border-radius:22px !important;
+  outline:none !important;
+  font-size:15px !important;
+}
+
+.input > button{
+  width:44px !important;
+  height:44px !important;
+  min-width:44px !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:50% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:20px !important;
+  font-weight:800 !important;
+}
+
+.input button:active,
+.chat-tool-btn:active{
+  transform:scale(.92);
+}
+</style>
+
+
+<style>
+/* Love Story message bubbles */
+.msg{
+  max-width:75% !important;
+  margin:6px 12px !important;
+  padding:10px 14px !important;
+  border-radius:18px !important;
+  font-size:15px !important;
+  line-height:1.45 !important;
+  word-wrap:break-word !important;
+  overflow-wrap:anywhere !important;
+  box-sizing:border-box !important;
+}
+
+.msg.me{
+  margin-left:auto !important;
+  margin-right:12px !important;
+  background:linear-gradient(135deg,#ff2fa4,#8b35ff) !important;
+  color:#fff !important;
+  border-bottom-right-radius:5px !important;
+  box-shadow:0 5px 15px rgba(255,45,170,.2) !important;
+}
+
+.msg.other{
+  margin-left:12px !important;
+  margin-right:auto !important;
+  background:rgba(255,255,255,.09) !important;
+  color:#f5f5f5 !important;
+  border:1px solid rgba(255,255,255,.07) !important;
+  border-bottom-left-radius:5px !important;
+}
+
+.msg img{
+  max-width:100% !important;
+  border-radius:14px !important;
+  display:block !important;
+}
+
+.msg:active{
+  transform:scale(.99);
+}
+</style>
+
+
+<style>
+/* Love Story mobile navigation */
+@media(max-width:700px){
+  #app{
+    min-height:100vh !important;
+  }
+
+  .app{
+    min-height:100vh !important;
+    padding-bottom:0 !important;
+  }
+
+  .chat{
+    width:100% !important;
+    min-height:100vh !important;
+  }
+
+  .messages{
+    padding-bottom:90px !important;
+  }
+
+  .ls-bottom-nav{
+    position:fixed !important;
+    left:10px !important;
+    right:10px !important;
+    bottom:10px !important;
+    width:auto !important;
+    height:64px !important;
+    z-index:9999 !important;
+    border-radius:22px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-around !important;
+    padding:5px !important;
+    box-sizing:border-box !important;
+    backdrop-filter:blur(18px) !important;
+    -webkit-backdrop-filter:blur(18px) !important;
+  }
+
+  .ls-nav-btn{
+    flex:1 !important;
+    height:54px !important;
+    border:0 !important;
+    background:transparent !important;
+    border-radius:16px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+    font-size:11px !important;
+  }
+
+  .ls-nav-btn span:first-child{
+    font-size:20px !important;
+    line-height:1 !important;
+  }
+
+  .header{
+    position:sticky !important;
+    top:0 !important;
+    z-index:100 !important;
+  }
+
+  .input{
+    position:sticky !important;
+    bottom:0 !important;
+    z-index:200 !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -1030,7 +1528,11 @@ body{
 
 <div class="auth-box">
 
-<h1>Love Stroy</h1>
+<div class="login-brand">
+  <div class="login-logo">❤️</div>
+  <h1>Love Story</h1>
+  <p>Connect. Share. Remember.</p>
+</div>
 
 <div id="loginForm">
 
@@ -1119,7 +1621,8 @@ Back to Email Login
 <aside class="sidebar">
 
 <div class="logo">
-❤️ Love Story
+  <span class="logo-mark">♡</span>
+  <span class="logo-text">Love <b>Story</b></span>
 </div>
 
 <div class="profile">
@@ -2307,6 +2810,38 @@ async function sendChatImage(fileInput){
 
   }finally{
     fileInput.value="";
+  }
+}
+
+
+function lsNav(section, btn){
+  document.querySelectorAll(".ls-nav-btn").forEach(function(b){
+    b.classList.remove("active");
+  });
+  if(btn) btn.classList.add("active");
+
+  if(section === "chats"){
+    document.querySelector(".chatUsers")?.scrollIntoView({behavior:"smooth",block:"start"});
+    return;
+  }
+
+  if(section === "people"){
+    document.getElementById("userSearch")?.focus();
+    return;
+  }
+
+  if(section === "notifications"){
+    alert("Notifications will appear here.");
+    return;
+  }
+
+  if(section === "menu"){
+    const menu=document.querySelector(".ls-menu");
+    if(menu){
+      menu.style.display = menu.style.display === "none" ? "block" : "none";
+    }else{
+      document.getElementById("profileInfo")?.scrollIntoView({behavior:"smooth",block:"start"});
+    }
   }
 }
 
