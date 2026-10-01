@@ -1868,4 +1868,16 @@ async function sendMessage(){
 
 
 
+// Restore existing login session when the app opens
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data && data.session) {
+      await startApp();
+    }
+  } catch (e) {
+    console.error("Session restore error:", e);
+  }
+});
+
 </script>
