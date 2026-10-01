@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Love Stroy</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>\n<script>
+<script src="supabase.js"></script>
+<script>
 window.addEventListener("error",function(e){
   alert("JavaScript Error:\n"+e.message);
 });
@@ -1037,6 +1038,10 @@ const SUPABASE_URL =
 
 const SUPABASE_PUBLISHABLE_KEY =
 "sb_publishable_HV5s-ma1aCh1hMSZI686lw_JiX66gpC";
+
+if(!window.supabase || typeof window.supabase.createClient !== "function"){
+  throw new Error("Supabase local library မတက်လာပါ");
+}
 
 const supabaseClient =
 window.supabase.createClient(
