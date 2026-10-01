@@ -14,6 +14,37 @@ if(!window.supabase){
 }
 </script>
 
+<script>
+window.loginWithGoogle = async function(){
+  try{
+    if(!window.supabase){
+      alert("Supabase JavaScript မတက်လာပါ");
+      return;
+    }
+
+    if(typeof supabaseClient === "undefined"){
+      alert("Supabase client မတက်လာပါ");
+      return;
+    }
+
+    const {data,error}=await supabaseClient.auth.signInWithOAuth({
+      provider:"google",
+      options:{
+        redirectTo:"lovestorychat://auth"
+      }
+    });
+
+    if(error){
+      alert("Google Login Error:\n"+error.message);
+      console.error(error);
+    }
+  }catch(e){
+    alert("Google Login Error:\n"+e.message);
+    console.error(e);
+  }
+};
+</script>
+
 
 <style>
 /* Messenger UI */
@@ -999,41 +1030,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-async function loginWithGoogle(){
-  try{
-    if(!window.supabase){
-      alert("Supabase library မတက်လာပါ");
-      return;
-    }
 
-    if(!supabaseClient){
-      alert("Supabase client မရှိပါ");
-      return;
-    }
-
-    const redirectTo = window.Capacitor
-      ? "lovestorychat://auth"
-      : window.location.origin;
-
-    const {data,error}=await supabaseClient.auth.signInWithOAuth({
-      provider:"google",
-      options:{
-        redirectTo:redirectTo
-      }
-    });
-
-    if(error){
-      alert("Google Login Error:\n"+error.message);
-      console.error(error);
-      return;
-    }
-
-    console.log("Google OAuth started",data);
-  }catch(e){
-    alert("Google Login Error:\n"+e.message);
-    console.error(e);
-  }
-}
 
 const SUPABASE_URL =
 "https://ggeerngrxlpmwgnujqsb.supabase.co";
@@ -1288,7 +1285,7 @@ async function register(){
   }
 }
 
-async function login(){
+window.login = async function login(){
   try{
     const email=document.getElementById("loginEmail").value.trim();
     const password=document.getElementById("loginPassword").value;
